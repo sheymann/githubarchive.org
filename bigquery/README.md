@@ -70,7 +70,8 @@ GROUP BY source, target, date
 ORDER BY date;
 
 /* Time elapsed from last push to the fork of the repos,
-   for repos not pushed after the fork*/
+   for repos not pushed after the fork,
+   sorted by elapsed time. */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
 	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
 	repository_language as lang,
@@ -81,6 +82,18 @@ WHERE repository_private="false"
 GROUP BY source, target, lang, elapsed_time
 HAVING elapsed_time > 0
 ORDER BY elapsed_time;
+
+/* Repos migrated to github, sorted by time elapsed from the last push */
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+	repository_created_at, 
+	repository_pushed_at,
+	repository_language as lang,
+	MAX((PARSE_UTC_USEC(repository_created_at) - PARSE_UTC_USEC(repository_pushed_at))) as deathtime
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false" AND repository_fork="false" AND repository_language="Ruby"
+GROUP BY repos, repository_created_at, repository_pushed_at, lang
+HAVING deathtime > 0
+ORDER BY deathtime;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
