@@ -59,14 +59,17 @@ WHERE type="PushEvent"
 ORDER BY date DESC
 
 /* fork events source repos to target repos, sorted by time */
-SELECT repository_owner as user_source, actor_attributes_login as user_target, created_at as date, repository_name, repository_created_at
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
+       CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target, 
+       created_at as date
 FROM [githubarchive:github.timeline]
 WHERE repository_language="Ruby" 
   AND repository_private="false"
   AND type="ForkEvent"
-GROUP BY user_source, user_target, repository_name, date, repository_created_at
-ORDER BY date ASC
-LIMIT 20
+  AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC('2012-07-17 00:00:00')
+GROUP BY source, target, date
+ORDER BY date
+LIMIT 20;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
