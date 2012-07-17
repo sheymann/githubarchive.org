@@ -94,6 +94,16 @@ WHERE repository_private="false" AND repository_fork="false" AND repository_lang
 GROUP BY repos, repository_created_at, repository_pushed_at, lang
 HAVING deathtime > 0
 ORDER BY deathtime;
+
+/* Forks having at least one new commit */
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+	repository_language as lang,
+	MAX((PARSE_UTC_USEC(repository_pushed_at) - PARSE_UTC_USEC(repository_created_at))) as lifetime
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false" AND repository_fork="true" AND type="PushEvent"
+GROUP BY repos, lang
+HAVING lifetime > 0
+ORDER BY lifetime;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
