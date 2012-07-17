@@ -60,12 +60,12 @@ ORDER BY date DESC
 
 /* fork events source repos to target repos, sorted by time */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as Source, 
-       CONCAT(actor_attributes_login, CONCAT('/', repository_name)) Target, 
-       created_at as Date
+	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) Target, 
+	created_at as Date
 FROM [githubarchive:github.timeline]
 WHERE repository_private="false"
-  AND type="ForkEvent"
-  AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC('2012-07-15 00:00:00')
+	AND type="ForkEvent"
+	AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC('2012-07-15 00:00:00')
 GROUP BY source, target, date
 ORDER BY date;
 ```
