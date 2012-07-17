@@ -57,6 +57,15 @@ WHERE type="PushEvent"
 	AND repository_watchers > 1
 	AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC('2012-04-01 00:00:00')
 ORDER BY date DESC
+
+/* fork events source repos to target repos, sorted by time */
+SELECT repository_owner as user_source, actor_attributes_login as user_target, created_at as date, repository_name, repository_created_at
+FROM [githubarchive:github.timeline]
+WHERE repository_language="Ruby" 
+  AND type="ForkEvent"
+GROUP BY user_source, user_target, repository_name, date, repository_created_at
+ORDER BY date ASC
+LIMIT 20
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
