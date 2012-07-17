@@ -68,6 +68,19 @@ WHERE repository_private="false"
 	AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC('2012-07-15 00:00:00')
 GROUP BY source, target, date
 ORDER BY date;
+
+/* Time elapsed from last push to the fork of the repos,
+   for repos not pushed after the fork*/
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
+	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
+	repository_language as lang,
+	(PARSE_UTC_USEC(created_at) - PARSE_UTC_USEC(repository_pushed_at)) as elapsed_time
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false"
+  AND type="ForkEvent"
+GROUP BY source, target, lang, elapsed_time
+HAVING elapsed_time > 0
+ORDER BY elapsed_time;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
