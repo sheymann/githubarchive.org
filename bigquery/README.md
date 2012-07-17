@@ -62,6 +62,7 @@ ORDER BY date DESC
 SELECT repository_owner as user_source, actor_attributes_login as user_target, created_at as date, repository_name, repository_created_at
 FROM [githubarchive:github.timeline]
 WHERE repository_language="Ruby" 
+  AND repository_private="false"
   AND type="ForkEvent"
 GROUP BY user_source, user_target, repository_name, date, repository_created_at
 ORDER BY date ASC
