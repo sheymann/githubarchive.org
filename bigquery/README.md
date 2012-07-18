@@ -121,6 +121,7 @@ WHERE repository_private = "false"
   AND type != "PushEvent" 
   AND PARSE_UTC_USEC(created_at) != PARSE_UTC_USEC(repository_pushed_at) 
   AND repository_language = "Perl"
+GROUP BY repos, type, duration
 ORDER BY repos, duration;
 ```
 
