@@ -191,6 +191,13 @@ FROM [githubarchive:github.timeline]
 WHERE type="FollowEvent"
 GROUP BY source, target, date, target_followers
 ORDER by date;
+
+/* watch network flow */
+SELECT actor as source, repository_owner as target, created_at as date
+FROM [githubarchive:github.timeline]
+WHERE type="WatchEvent"
+GROUP BY source, target, date
+ORDER by date;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
