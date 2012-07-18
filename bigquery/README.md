@@ -111,6 +111,17 @@ SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 FROM [githubarchive:github.timeline]
 WHERE repository_private="false" AND repository_fork="false" AND type="PushEvent" AND repository_language="Ruby"
 ORDER BY repos, date;
+
+/* Time elapsed between non-push events and last push on Perl repos */
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+	type,
+	(PARSE_UTC_USEC(created_at) - PARSE_UTC_USEC(repository_pushed_at)) as duration
+FROM [githubarchive:github.timeline]
+WHERE repository_private = "false" 
+  AND type != "PushEvent" 
+  AND PARSE_UTC_USEC(created_at) != PARSE_UTC_USEC(repository_pushed_at) 
+  AND repository_language = "Perl"
+ORDER BY repos, duration;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
