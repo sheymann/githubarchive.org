@@ -186,14 +186,14 @@ ORDER BY date;
 /******************************************/
 
 /* follow network flow */
-SELECT actor as source, payload_target_login as target, created_at as date, payload_target_followers as target_followers
+SELECT actor as source, payload_target_login as target, PARSE_UTC_USEC(created_at) as date, payload_target_followers as target_followers
 FROM [githubarchive:github.timeline]
 WHERE type="FollowEvent"
 GROUP BY source, target, date, target_followers
 ORDER by date;
 
 /* watch network flow */
-SELECT actor as source, repository_owner as target, created_at as date
+SELECT actor as source, repository_owner as target, PARSE_UTC_USEC(created_at) as date
 FROM [githubarchive:github.timeline]
 WHERE type="WatchEvent"
 GROUP BY source, target, date
