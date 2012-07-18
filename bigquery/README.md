@@ -83,7 +83,7 @@ GROUP BY source, target, lang, elapsed_time
 HAVING elapsed_time > 0
 ORDER BY elapsed_time;
 
-/* Repos migrated to github, sorted by time elapsed from the last push */
+/* Dead migrated repos: Repos migrated to github, sorted by time elapsed from the last push */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 	repository_created_at, 
 	repository_pushed_at,
@@ -95,7 +95,7 @@ GROUP BY repos, repository_created_at, repository_pushed_at, lang
 HAVING deathtime > 0
 ORDER BY deathtime;
 
-/* Forks having at least one new commit */
+/* Active forks: Forks having at least one new commit */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 	repository_language as lang,
 	MAX((PARSE_UTC_USEC(repository_pushed_at) - PARSE_UTC_USEC(repository_created_at))) as lifetime
@@ -104,6 +104,13 @@ WHERE repository_private="false" AND repository_fork="true" AND type="PushEvent"
 GROUP BY repos, lang
 HAVING lifetime > 0
 ORDER BY lifetime;
+
+/* Ruby push dates (to study commit freq) */
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+	PARSE_UTC_USEC(created_at) as date
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false" AND repository_fork="false" AND type="PushEvent" AND repository_language="Ruby"
+ORDER BY repos, date;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
