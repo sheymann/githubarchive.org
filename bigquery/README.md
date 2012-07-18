@@ -119,6 +119,8 @@ SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 FROM [githubarchive:github.timeline]
 WHERE repository_private = "false" 
   AND type != "PushEvent" 
+  AND type != "CreateEvent"
+  AND type != "DeleteEvent"
   AND PARSE_UTC_USEC(created_at) != PARSE_UTC_USEC(repository_pushed_at) 
   AND repository_language = "Perl"
 GROUP BY repos, type, duration
