@@ -125,7 +125,10 @@ WHERE repository_private = "false"
 GROUP BY repos, type, duration
 ORDER BY repos, duration;
 
-// Which repos gives code to which repos?
+
+/******************************************/
+/* Which repos gives code to which repos? */
+/******************************************/
 
 /* fork network flow */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
@@ -149,6 +152,33 @@ FROM [githubarchive:github.timeline]
 WHERE repository_private="false"
   AND type="PullRequestEvent"
 GROUP BY source, target, lang, type, date
+ORDER BY date;
+
+
+/******************************************/
+/* Who contributes to the repos of who? */
+/******************************************/
+
+/* contribution network flow */
+SELECT 
+	actor_attributes_login as source,
+	repository_owner as target,
+	repository_name as repos,
+	repository_language as lang,
+	type,
+	PARSE_UTC_USEC(created_at) as date
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false"
+  AND (type="IssuesEvent" 
+       OR type="IssueCommentEvent" 
+       OR type="CommitCommentEvent" 
+       OR type="CreateEvent"
+       OR type="DeleteEvent"
+       OR type="GollumEvent"
+       OR type="PullRequestEvent"
+       OR type="PullRequestReviewCommentEvent")
+  AND actor_attributes_login != repository_owner
+GROUP BY source, target, repos, lang, type, date
 ORDER BY date;
 ```
 
