@@ -125,6 +125,8 @@ WHERE repository_private = "false"
 GROUP BY repos, type, duration
 ORDER BY repos, duration;
 
+// Which repos gives code to which repos?
+
 /* fork network flow */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
     CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
