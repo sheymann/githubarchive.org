@@ -124,6 +124,30 @@ WHERE repository_private = "false"
   AND repository_language = "Perl"
 GROUP BY repos, type, duration
 ORDER BY repos, duration;
+
+/* fork network flow */
+SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
+    CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
+    repository_language as lang,
+    type,
+    PARSE_UTC_USEC(created_at)as date
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false"
+  AND type="ForkEvent"
+GROUP BY source, target, lang, type, date
+ORDER BY date;
+
+/* pull request network flow */
+SELECT CONCAT(actor_attributes_login, CONCAT('/', repository_name)) source,
+    CONCAT(repository_owner, CONCAT('/', repository_name)) as target, 
+    repository_language as lang,
+    type,
+    PARSE_UTC_USEC(created_at)as date
+FROM [githubarchive:github.timeline]
+WHERE repository_private="false"
+  AND type="PullRequestEvent"
+GROUP BY source, target, lang, type, date
+ORDER BY date;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
