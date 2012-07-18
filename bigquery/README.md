@@ -156,7 +156,7 @@ ORDER BY date;
 
 
 /******************************************/
-/* Who contributes to the repos of who? */
+/* Who contributes to the repos of whom? */
 /******************************************/
 
 /* contribution network flow */
@@ -180,6 +180,17 @@ WHERE repository_private="false"
   AND actor_attributes_login != repository_owner
 GROUP BY source, target, repos, lang, type, date
 ORDER BY date;
+
+/******************************************/
+/* Who is passively connected to whom? */
+/******************************************/
+
+/* follow network flow */
+SELECT actor as source, payload_target_login as target, created_at as date, payload_target_followers as target_followers
+FROM [githubarchive:github.timeline]
+WHERE type="FollowEvent"
+GROUP BY source, target, date, target_followers
+ORDER by date;
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
