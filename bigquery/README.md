@@ -58,6 +58,11 @@ WHERE type="PushEvent"
 	AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC('2012-04-01 00:00:00')
 ORDER BY date DESC
 
+
+/**************/
+/* My queries */
+/**************/
+
 /* fork events source repos to target repos, sorted by time */
 SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
 	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target, 
@@ -155,9 +160,9 @@ GROUP BY source, target, lang, type, date
 ORDER BY date;
 
 
-/******************************************/
+/*****************************************/
 /* Who contributes to the repos of whom? */
-/******************************************/
+/*****************************************/
 
 /* contribution network flow */
 SELECT 
