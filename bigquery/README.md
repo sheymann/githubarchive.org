@@ -64,7 +64,7 @@ ORDER BY date DESC
 /**************/
 
 /* fork events source repos to target repos, sorted by time */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
 	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target, 
 	created_at as date
 FROM [githubarchive:github.timeline]
@@ -76,7 +76,7 @@ ORDER BY date;
 /* Time elapsed from last push to the fork of the repos,
    for repos not pushed after the fork,
    sorted by elapsed time. */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
 	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
 	repository_language as lang,
 	(PARSE_UTC_USEC(created_at) - PARSE_UTC_USEC(repository_pushed_at)) as elapsed_time
@@ -88,7 +88,7 @@ HAVING elapsed_time > 0
 ORDER BY elapsed_time;
 
 /* Dead migrated repos: Repos migrated to github, sorted by time elapsed from the last push */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 	repository_created_at, 
 	repository_pushed_at,
 	repository_language as lang,
@@ -100,7 +100,7 @@ HAVING deathtime > 0
 ORDER BY deathtime;
 
 /* Active forks: Forks having at least one new commit */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 	repository_language as lang,
 	MAX((PARSE_UTC_USEC(repository_pushed_at) - PARSE_UTC_USEC(repository_created_at))) as lifetime
 FROM [githubarchive:github.timeline]
@@ -110,14 +110,14 @@ HAVING lifetime > 0
 ORDER BY lifetime;
 
 /* Ruby push dates (to study commit freq) */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 	PARSE_UTC_USEC(created_at) as date
 FROM [githubarchive:github.timeline]
 WHERE repository_private="false" AND repository_fork="false" AND type="PushEvent" AND repository_language="Ruby"
 ORDER BY repos, date;
 
 /* Time elapsed between non-push events and last push on Perl repos */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as repos,
 	type,
 	(PARSE_UTC_USEC(created_at) - PARSE_UTC_USEC(repository_pushed_at)) as duration
 FROM [githubarchive:github.timeline]
@@ -136,11 +136,11 @@ ORDER BY repos, duration;
 /******************************************/
 
 /* fork network flow */
-SELECT CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
-    CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
-    repository_language as lang,
-    type,
-    PARSE_UTC_USEC(created_at)as date
+SELECT  CONCAT(repository_owner, CONCAT('/', repository_name)) as source, 
+	CONCAT(actor_attributes_login, CONCAT('/', repository_name)) target,
+	repository_language as lang,
+	type,
+	PARSE_UTC_USEC(created_at)as date
 FROM [githubarchive:github.timeline]
 WHERE repository_private="false"
   AND type="ForkEvent"
@@ -148,11 +148,11 @@ GROUP BY source, target, lang, type, date
 ORDER BY date;
 
 /* pull request network flow */
-SELECT CONCAT(actor_attributes_login, CONCAT('/', repository_name)) source,
-    CONCAT(repository_owner, CONCAT('/', repository_name)) as target, 
-    repository_language as lang,
-    type,
-    PARSE_UTC_USEC(created_at)as date
+SELECT  CONCAT(actor_attributes_login, CONCAT('/', repository_name)) source,
+	CONCAT(repository_owner, CONCAT('/', repository_name)) as target, 
+	repository_language as lang,
+	type,
+	PARSE_UTC_USEC(created_at)as date
 FROM [githubarchive:github.timeline]
 WHERE repository_private="false"
   AND type="PullRequestEvent"
@@ -165,8 +165,7 @@ ORDER BY date;
 /*****************************************/
 
 /* contribution network flow */
-SELECT 
-	actor_attributes_login as source,
+SELECT  actor_attributes_login as source,
 	repository_owner as target,
 	repository_name as repos,
 	repository_language as lang,
@@ -191,7 +190,10 @@ ORDER BY date;
 /******************************************/
 
 /* follow network flow */
-SELECT actor as source, payload_target_login as target, PARSE_UTC_USEC(created_at) as date, payload_target_followers as target_followers
+SELECT  actor as source, 
+	payload_target_login as target, 
+	PARSE_UTC_USEC(created_at) as date, 
+	payload_target_followers as target_followers
 FROM [githubarchive:github.timeline]
 WHERE type="FollowEvent"
 GROUP BY source, target, date, target_followers
